@@ -28,7 +28,11 @@ extra["springGrpcVersion"] = "0.10.0"
 val ulidCreatorVersion = "5.2.3"
 
 dependencies {
+    // web
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // grpc
     implementation("io.grpc:grpc-services")
@@ -40,7 +44,6 @@ dependencies {
 
     // db
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // external
     implementation("com.github.f4b6a3:ulid-creator:$ulidCreatorVersion")
