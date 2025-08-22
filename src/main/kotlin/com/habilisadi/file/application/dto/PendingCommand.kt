@@ -1,6 +1,7 @@
-package com.habilisadi.file.application.pending.dto
+package com.habilisadi.file.application.dto
 
-import com.habilisadi.file.PendingRequest
+import com.habilisadi.file.Destination
+import com.habilisadi.file.SavePendingRequest
 import com.habilisadi.file.Status
 import com.habilisadi.file.UpdatePendingRequest
 
@@ -9,12 +10,12 @@ class PendingCommand {
         val userPk: String,
         val prevFileName: String,
         val prevFilePath: String,
-        val destination: String
+        val destination: Destination
     ) {
         companion object {
-            fun from(req: PendingRequest): Save {
+            fun from(req: SavePendingRequest): Save {
                 if (req.fileName.isNullOrBlank()) throw IllegalArgumentException("파일명이 없습니다.")
-                if (req.destination.isNullOrBlank()) throw IllegalArgumentException("저장 경로가 없습니다.")
+                if (req.destination == Destination.UNRECOGNIZED) throw IllegalArgumentException("사용 목적이 없습니다.")
                 if (req.userPk.isNullOrBlank()) throw IllegalArgumentException("유저 정보가 없습니다.")
                 if (req.filePath.isNullOrBlank()) throw IllegalArgumentException("파일명이 없습니다.")
 
@@ -30,13 +31,22 @@ class PendingCommand {
 
     data class Update(
         val id: String,
-        val status: Status
+        val userPk: String,
+        val status: Status,
+        val destination: Destination
     ) {
         companion object {
             fun from(req: UpdatePendingRequest): Update {
+                if (req.id.isNullOrBlank()) throw IllegalArgumentException("파일명이 없습니다.")
+                if (req.userPk.isNullOrBlank()) throw IllegalArgumentException("유저 정보가 없습니다.")
+                if (req.status == null) throw IllegalArgumentException("상태 정보가 없습니다.")
+                if (req.destination == Destination.UNRECOGNIZED) throw IllegalArgumentException("사용 목적이 없습니다.")
+
                 return Update(
                     id = req.id,
-                    status = req.status
+                    userPk = req.userPk,
+                    status = req.status,
+                    destination = req.destination
                 )
             }
         }

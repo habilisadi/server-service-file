@@ -5,10 +5,17 @@ import com.habilisadi.file.common.application.port.out.BaseRedisRepository
 import org.springframework.data.redis.core.RedisTemplate
 import java.time.Duration
 
-open class BaseRedisRepositoryImpl<T>(
+class BaseRedisRepositoryImpl<T>(
+    private val clazz: Class<T>,
     private val redisTemplate: RedisTemplate<String, String>,
     private val objMapper: ObjectMapper
 ) : BaseRedisRepository<T> {
+
+    override fun findByKey(key: String): T? {
+        val json = redisTemplate.opsForValue().get(key) ?: return null
+        return objMapper.readValue(json, clazz)
+    }
+
     override fun saveValue(key: String, value: T): Boolean {
         return this.saveValue(key, value, Duration.ofMinutes(10))
     }

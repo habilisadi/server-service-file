@@ -1,21 +1,26 @@
 package com.habilisadi.file.infrastructure.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.habilisadi.file.application.pending.port.out.PendingRepository
-import com.habilisadi.file.common.adapter.out.BaseRedisRepositoryImpl
-import com.habilisadi.file.domain.pending.model.PendingEntity
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.StringRedisSerializer
 
 @Configuration
 class RedisConfig {
 
     @Bean
-    fun pendingRepository(
-        redisTemplate: RedisTemplate<String, String>,
-        objMapper: ObjectMapper
-    ): PendingRepository {
-        return object : BaseRedisRepositoryImpl<PendingEntity>(redisTemplate, objMapper), PendingRepository {}
+    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
+        return RedisTemplate<String, String>().apply {
+            this.connectionFactory = connectionFactory
+
+            keySerializer = StringRedisSerializer()
+            valueSerializer = StringRedisSerializer()
+
+            hashKeySerializer = StringRedisSerializer()
+            hashValueSerializer = StringRedisSerializer()
+
+            afterPropertiesSet()
+        }
     }
 }

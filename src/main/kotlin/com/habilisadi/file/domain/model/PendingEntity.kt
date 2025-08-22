@@ -1,4 +1,4 @@
-package com.habilisadi.file.domain.pending.model
+package com.habilisadi.file.domain.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.f4b6a3.ulid.UlidCreator

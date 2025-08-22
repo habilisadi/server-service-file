@@ -1,10 +1,12 @@
-package com.habilisadi.file.domain.pending.model
+package com.habilisadi.file.domain.model
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.f4b6a3.ulid.UlidCreator
 import java.nio.file.Paths
 
-data class FilePath(
-    private var _value: String
+data class FilePath @JsonCreator constructor(
+    @JsonProperty("value") private var _value: String
 ) {
     var value: String = _value
         set(value) {
@@ -22,19 +24,19 @@ data class FilePath(
         val uploadDir: String = "/upload/"
 
         fun of(value: String): FilePath {
-            val path = Paths.get(this.uploadDir, value).toString()
+            val path = Paths.get(uploadDir, value).toString()
             return FilePath(path)
         }
 
         fun of(value: String, subPath: String): FilePath {
-            val path = Paths.get(this.uploadDir, value, subPath).toString()
+            val path = Paths.get(uploadDir, value, subPath).toString()
             return FilePath(path)
         }
 
         fun of(): FilePath {
             val ulid = UlidCreator.getUlid().toString()
 
-            val path = Paths.get(this.uploadDir, ulid.substring(0, 2), ulid).toString()
+            val path = Paths.get(uploadDir, ulid.substring(0, 2), ulid).toString()
             return FilePath(path)
         }
     }

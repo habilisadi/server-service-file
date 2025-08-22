@@ -1,25 +1,25 @@
-package com.habilisadi.file.application.pending.service
+package com.habilisadi.file.application.service
 
-import com.habilisadi.file.PendingResponse
-import com.habilisadi.file.application.pending.dto.PendingCommand
-import com.habilisadi.file.application.pending.port.`in`.SavePendingUseCase
-import com.habilisadi.file.application.pending.port.out.PendingRepository
-import com.habilisadi.file.domain.pending.model.FileName
-import com.habilisadi.file.domain.pending.model.FilePath
-import com.habilisadi.file.domain.pending.model.PendingEntity
+import com.habilisadi.file.SavePendingResponse
+import com.habilisadi.file.application.dto.PendingCommand
+import com.habilisadi.file.application.port.`in`.SavePendingUseCase
+import com.habilisadi.file.application.port.out.PendingRepository
+import com.habilisadi.file.domain.model.FileName
+import com.habilisadi.file.domain.model.FilePath
+import com.habilisadi.file.domain.model.PendingEntity
+import com.habilisadi.file.infrastructure.config.properties.RedisPendingKeyProperties
 import org.springframework.stereotype.Service
 
 @Service
 class SavePendingService(
+    private val redisPendingKeyProps: RedisPendingKeyProperties,
     private val pendingRepository: PendingRepository
 ) : SavePendingUseCase {
-    private val PENDING_KEY_PREFIX = "pending:"
-
-    override fun save(command: PendingCommand.Save): PendingResponse {
+    override fun save(command: PendingCommand.Save): SavePendingResponse {
 
         val prevFilePath = FilePath(command.prevFilePath)
         val prevFileName = FileName(command.prevFileName)
-        val nextFilePath = FilePath.of(command.userPk, command.destination)
+        val nextFilePath = FilePath.of(command.userPk, command.destination.name)
         val nextFileName = FileName.of(prevFileName.toExt())
 
         val pendingEntity = PendingEntity(
@@ -28,11 +28,10 @@ class SavePendingService(
             prevFilePath = prevFilePath,
             nextFileName = nextFileName,
             nextFilePath = nextFilePath,
-            destination = command.destination,
+            destination = command.destination.name,
         )
 
-        val key = PENDING_KEY_PREFIX + pendingEntity.id
-
+        val key = "${redisPendingKeyProps.PENDING_PREFIX}:${command.destination.name}:${pendingEntity.id}"
 
         val result = pendingRepository.saveValue(key, pendingEntity)
 
@@ -40,7 +39,7 @@ class SavePendingService(
             throw IllegalArgumentException("저장에 실패했습니다.")
         }
 
-        return PendingResponse.newBuilder()
+        return SavePendingResponse.newBuilder()
             .setId(pendingEntity.id)
             .setPrevFileName(pendingEntity.prevFileName.value)
             .setPrevFilePath(pendingEntity.prevFilePath.value)
