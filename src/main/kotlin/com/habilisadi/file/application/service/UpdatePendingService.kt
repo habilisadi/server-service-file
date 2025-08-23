@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service
 @Service
 class UpdatePendingService(
     private val redisPendingKeyProps: RedisPendingKeyProperties,
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private val pendingRepository: PendingRepository
 ) : UpdatePendingUseCase {
-//    lateinit var pendingRepository: PendingRepository
-
+    
     override fun update(command: PendingCommand.Update): UpdatePendingResponse {
         val key = "${redisPendingKeyProps.PENDING_PREFIX}:${command.destination}:${command.id}"
         val pendingEntity = pendingRepository.findByKey(key)

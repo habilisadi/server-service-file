@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration
     basePackages = [
         "com.habilisadi.file.application.port.out",
         "com.habilisadi.file.common.application.port.out",
-        "com.habilisadi.file.common.adapter.out"
     ]
 )
 class RedisRepositoryConfig

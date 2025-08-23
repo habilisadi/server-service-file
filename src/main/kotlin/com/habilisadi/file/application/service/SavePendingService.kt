@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service
 @Service
 class SavePendingService(
     private val redisPendingKeyProps: RedisPendingKeyProperties,
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private val pendingRepository: PendingRepository
 ) : SavePendingUseCase {
+    
     override fun save(command: PendingCommand.Save): SavePendingResponse {
 
         val prevFilePath = FilePath(command.prevFilePath)

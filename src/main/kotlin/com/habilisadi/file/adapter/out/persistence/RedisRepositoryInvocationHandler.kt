@@ -29,7 +29,6 @@ class RedisRepositoryInvocationHandler(
         return try {
             method.invoke(delegate, *(args ?: emptyArray()))
         } catch (e: Exception) {
-            println("❌ Delegated method call failed: ${method.name}")
             e.printStackTrace()
             when (method.returnType) {
                 Boolean::class.java -> false
@@ -43,16 +42,17 @@ class RedisRepositoryInvocationHandler(
         val genericInterfaces = repositoryInterface.genericInterfaces
 
         for (genericInterface in genericInterfaces) {
-            if (genericInterface is ParameterizedType) {
-                val rawType = genericInterface.rawType
+            if (genericInterface !is ParameterizedType) continue
 
-                if (rawType == BaseRedisRepository::class.java) {
-                    val typeArguments = genericInterface.actualTypeArguments
-                    if (typeArguments.isNotEmpty()) {
-                        return typeArguments[0] as Class<*>
-                    }
-                }
-            }
+            val rawType = genericInterface.rawType
+
+            if (rawType != BaseRedisRepository::class.java) continue
+
+            val typeArguments = genericInterface.actualTypeArguments
+
+            if (typeArguments.isEmpty()) continue
+
+            return typeArguments[0] as Class<*>
         }
 
         throw IllegalArgumentException("Cannot extract entity type from ${repositoryInterface.name}")
